@@ -1,7 +1,12 @@
 {
   "compilerOptions": {
-    "outDir": "./dist", // Output directory for compiled JavaScript files
-    "rootDir": "./src", // Root directory for TypeScript files
+    "target": "es2022",
+    "module": "commonjs",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
     "sourceMap": true, // Generate source maps
   },
   "include": [
