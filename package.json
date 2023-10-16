@@ -1,0 +1,28 @@
+{
+  "name": "drawio-poc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "watch": "./node_modules/.bin/tsc -w",
+    "run": "node ./dist/index.js",
+    "start": "onchange 'src/**/*.ts' -- npm run run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wschaef/drawio-poc.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wschaef/drawio-poc/issues"
+  },
+  "homepage": "https://github.com/wschaef/drawio-poc#readme",
+  "devDependencies": {
+    "onchange": "^7.1.0",
+    "typescript": "^5.2.2"
+  }
+}

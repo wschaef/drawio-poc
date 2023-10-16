@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist", // Output directory for compiled JavaScript files
+    "rootDir": "./src", // Root directory for TypeScript files
+    "sourceMap": true, // Generate source maps
+  },
+  "include": [
+    "src/**/*.ts" // Files to be compiled
+  ]
+}
