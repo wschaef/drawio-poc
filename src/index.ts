@@ -10,7 +10,7 @@ const main = async () => {
     try {
         const model = await parser.parse(inputFilename);
         const transformer = new Transformer();
-        transformer.transformMxCell(model);
+        await transformer.transformMxCell(model);
         parser.exportToFile(outputFilename, model)
     } catch (error) {
         console.error(error);
