@@ -1,6 +1,6 @@
 import { parseString, Builder } from 'xml2js';
 export class Transformer {
-    public DEFAULT_HEIGHT = -100
+    public DEFAULT_HEIGHT = -30
     public async transformMxCell(model: any): Promise<void> {
 
         const mxCells = model?.mxfile?.diagram[0]?.mxGraphModel[0]?.root[0]?.mxCell;
@@ -11,41 +11,46 @@ export class Transformer {
         }
 
         for (const mxCell of mxCells) {
-            if (mxCell.$.id === '2') {
-                // mxCell.mxGeometry[0].$.width = '320';
-                // console.log('Transformed mxCell with id=2');
+            // if (mxCell.$.id > '1') {
+            if (mxCell.$.style?.startsWith("rounded=")) {
+
                 let x = parseInt(mxCell.mxGeometry[0].$.x) || 0
                 let y = parseInt(mxCell.mxGeometry[0].$.y) || 0
                 let width = parseInt(mxCell.mxGeometry[0].$.width) || 1
                 let height = parseInt(mxCell.mxGeometry[0].$.height) || 1
 
-                console.log(mxCell.mxGeometry)
-
                 let newPolyCoords = [
-                    this.toIso([x, y + height]),
-                    this.toIso([x, y]),
-                    this.add3dHeight(this.toIso([x, y])),
-                    this.add3dHeight(this.toIso([x + width, y])),
-                    this.add3dHeight(this.toIso([x + width, y + height])),
-                    this.toIso([x + width, y + height]),
-                    this.toIso([x, y + height]),
-                    this.add3dHeight(this.toIso([x, y + height])),
-                    this.add3dHeight(this.toIso([x, y])),
-                    this.add3dHeight(this.toIso([x, y + height])),
-                    this.add3dHeight(this.toIso([x + width, y + height])),
-                ]
-                newPolyCoords.forEach(c => [c[0] / width, c[1] / height])
+                    this.toIso([0, height]),
+                    this.toIso([0, 0]),
+                    this.add3dHeight(this.toIso([0, 0])),
+                    this.add3dHeight(this.toIso([width, 0])),
+                    this.add3dHeight(this.toIso([width, height])),
+                    this.toIso([width, height]),
+                    this.toIso([0, height]),
+                    this.add3dHeight(this.toIso([0, height])),
+                    this.add3dHeight(this.toIso([0, 0])),
+                    this.add3dHeight(this.toIso([0, height])),
+                    this.add3dHeight(this.toIso([width, height])),
+                ];
 
-                console.log(newPolyCoords)
-                const template = await this.getXmlObject(templateQuader)
-                let style = template.mxCell.$.style;
-                style = style.replace("{{polyCoords}}", JSON.stringify(newPolyCoords));
+                // make geometry more centralized
+                newPolyCoords = newPolyCoords.map(c => [c[0] - width / 2, c[1] + height / 2 - this.DEFAULT_HEIGHT])
+
+                // scale shape to be relative to the geometry
+                newPolyCoords = newPolyCoords.map(c => [c[0] / width, c[1] / height])
+
+                // const template = await this.getXmlObject(templateQuader)
+                // let style = template.mxCell.$.style;
+                let style = `shape=mxgraph.basic.polygon;polyCoords=${JSON.stringify(newPolyCoords)};polyline=1;`
 
                 // Update the style string
-                mxCell.$.style = style;
-                // mxCell.mxGeometry[0].$.width = 400
+                mxCell.$.style = mxCell.$.style + style
+                mxCell.mxGeometry[0].$.width = width
+                mxCell.mxGeometry[0].$.height = height
+                const shift = this.toIso([x, y]) // move the geometry according the isometric
+                mxCell.mxGeometry[0].$.x = shift[0]
+                mxCell.mxGeometry[0].$.y = shift[1]
 
-                break;
             }
         }
         new Builder().buildObject(model)
@@ -56,9 +61,6 @@ export class Transformer {
     }
 
     public toIso([x, y]: [number, number]): [number, number] {
-        // x = parseInt(x)
-        // y = parseInt(y)
-        // sin(30) = 0,5
         let newCoordinates = [Math.cos(30 * (Math.PI / 180)) * (x + y), 0.5 * (y - x)];
         return newCoordinates.map(c => parseFloat(c.toFixed(2))) as [number, number]
     }
@@ -78,8 +80,8 @@ export class Transformer {
 }
 
 
-const templateQuader = `
-<mxCell id="5" value="" style="verticalLabelPosition=bottom;verticalAlign=top;html=1;shape=mxgraph.basic.polygon;polyCoords={{polyCoords}};polyline=1;fillColor=none;" vertex="1" parent="1">
-  <mxGeometry x="-31" y="98" width="10" height="10" as="geometry"/>
+const templateText = `
+<mxCell id="15" value="Text" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;rotation=330;fontColor=#FF3333;" vertex="1" parent="1">
+    <mxGeometry x="-470" y="315" width="149" height="78" as="geometry"/>
 </mxCell>
 `;
